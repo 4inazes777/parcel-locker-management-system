@@ -4,21 +4,21 @@ on:
   push:
     branches:
       - main
-      - master
-
+      - feature/**
   pull_request:
     branches:
       - main
-      - master
 
 jobs:
-  build-and-test:
-    name: Build, test, integration test, and coverage
+  build:
+    name: Build, test, integration test, coverage, and SonarCloud
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -27,13 +27,14 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Show Java and Maven versions
-        run: |
-          java -version
-          mvn -version
+      - name: Build, test, integration test, and coverage
+        run: xvfb-run -a mvn -B clean verify
 
-      - name: Run Maven verify with virtual display
-        run: xvfb-run -a mvn -B -U clean verify
+      - name: Run SonarCloud analysis
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       - name: Upload JaCoCo report
         if: always()
@@ -42,16 +43,18 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco
 
-      - name: Upload Surefire test reports
+      - name: Upload PIT report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: surefire-reports
-          path: target/surefire-reports
+          name: pit-report
+          path: target/pit-reports
 
-      - name: Upload Failsafe integration test reports
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: failsafe-reports
-          path: target/failsafe-reports
+          name: test-reports
+          path: |
+            target/surefire-reports
+            target/failsafe-reports
