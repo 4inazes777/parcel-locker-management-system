@@ -132,10 +132,12 @@ class DomainModelTest {
         Parcel parcel = new Parcel("TRK-001", "Phone charger", Size.SMALL, customer);
 
         assertThat(customer.getParcels()).contains(parcel);
+        assertThat(parcel.getCustomer()).isSameAs(customer);
 
         customer.removeParcel(parcel);
 
         assertThat(customer.getParcels()).doesNotContain(parcel);
+        assertThat(parcel.getCustomer()).isNull();
     }
 
     @Test

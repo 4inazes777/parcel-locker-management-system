@@ -181,4 +181,69 @@ class RepositoryAdditionalTest {
             assertThat(lockerCellRepository.findById(-1L)).isEmpty();
         });
     }
+
+    @Test
+    void customerRepositorySaveShouldReturnPersistedNewCustomer() {
+        transactionManager.doInTransaction(entityManager -> {
+            CustomerRepository customerRepository = new CustomerRepository(entityManager);
+
+            Customer customer = new Customer("Returned Customer", "+390000001010");
+
+            Customer savedCustomer = customerRepository.save(customer);
+
+            assertThat(savedCustomer).isSameAs(customer);
+            assertThat(savedCustomer.getId()).isNotNull();
+        });
+    }
+
+    @Test
+    void customerRepositoryFindAllShouldReturnCustomersOrderedByFullName() {
+        transactionManager.doInTransaction(entityManager -> {
+            CustomerRepository customerRepository = new CustomerRepository(entityManager);
+
+            customerRepository.save(new Customer("Zoe Customer", "+390000001011"));
+            customerRepository.save(new Customer("Alice Customer", "+390000001012"));
+
+            assertThat(customerRepository.findAll())
+                    .extracting(Customer::getFullName)
+                    .containsExactly("Alice Customer", "Zoe Customer");
+        });
+    }
+
+    @Test
+    void parcelRepositorySaveShouldReturnPersistedNewParcel() {
+        transactionManager.doInTransaction(entityManager -> {
+            CustomerRepository customerRepository = new CustomerRepository(entityManager);
+            ParcelRepository parcelRepository = new ParcelRepository(entityManager);
+
+            Customer customer = new Customer("Parcel Return Owner", "+390000001013");
+            customerRepository.save(customer);
+
+            Parcel parcel = new Parcel(
+                    "TRK-RETURNED-SAVE",
+                    "Returned parcel",
+                    Size.SMALL,
+                    customer
+            );
+
+            Parcel savedParcel = parcelRepository.save(parcel);
+
+            assertThat(savedParcel).isSameAs(parcel);
+            assertThat(savedParcel.getId()).isNotNull();
+        });
+    }
+
+    @Test
+    void lockerCellRepositorySaveShouldReturnPersistedNewLockerCell() {
+        transactionManager.doInTransaction(entityManager -> {
+            LockerCellRepository lockerCellRepository = new LockerCellRepository(entityManager);
+
+            LockerCell lockerCell = new LockerCell("RETURN-CELL-1", Size.LARGE);
+
+            LockerCell savedLockerCell = lockerCellRepository.save(lockerCell);
+
+            assertThat(savedLockerCell).isSameAs(lockerCell);
+            assertThat(savedLockerCell.getId()).isNotNull();
+        });
+    }
 }

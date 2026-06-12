@@ -140,25 +140,24 @@ class ParcelLockerApplicationServiceTest {
                 });
     }
 
-
     @Test
-        void constructorShouldRejectNullTransactionManager() {
+    void constructorShouldRejectNullTransactionManager() {
         assertThatThrownBy(() -> new ParcelLockerApplicationService(null, () -> "111222"))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Transaction manager cannot be null");
-        }
+    }
 
-        @Test
-        void constructorShouldRejectNullPickupCodeGenerator() {
+    @Test
+    void constructorShouldRejectNullPickupCodeGenerator() {
         TransactionManager transactionManager = new TransactionManager(entityManagerFactory);
 
         assertThatThrownBy(() -> new ParcelLockerApplicationService(transactionManager, null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Pickup code generator cannot be null");
-        }
+    }
 
-        @Test
-        void cannotCreateParcelWithDuplicateTrackingNumber() {
+    @Test
+    void cannotCreateParcelWithDuplicateTrackingNumber() {
         Long customerId = applicationService.registerCustomer("Alice Brown", "+390000009100");
 
         applicationService.createParcel(
@@ -176,10 +175,10 @@ class ParcelLockerApplicationServiceTest {
         ))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Parcel with this tracking number already exists");
-        }
+    }
 
-        @Test
-        void cannotCreateParcelForMissingCustomer() {
+    @Test
+    void cannotCreateParcelForMissingCustomer() {
         assertThatThrownBy(() -> applicationService.createParcel(
                 "APP-MISSING-CUSTOMER-001",
                 "Parcel without customer",
@@ -188,20 +187,71 @@ class ParcelLockerApplicationServiceTest {
         ))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Customer not found");
-        }
+    }
 
-        @Test
-        void cannotAssignMissingParcel() {
+    @Test
+    void cannotAssignMissingParcel() {
         assertThatThrownBy(() -> applicationService.assignParcelToAvailableCell(-1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Parcel not found");
-        }
+    }
 
-        @Test
-        void cannotCollectMissingParcel() {
+    @Test
+    void cannotCollectMissingParcel() {
         assertThatThrownBy(() -> applicationService.collectParcel(-1L, "111222"))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Parcel not found");
-        }
+    }
 
+    @Test
+    void createLockerCellShouldReturnGeneratedIdAndExposeCreatedCell() {
+        Long lockerCellId = applicationService.createLockerCell("MUT-CELL-001", Size.MEDIUM);
+
+        assertThat(lockerCellId).isNotNull().isPositive();
+
+        assertThat(applicationService.findAllLockerCells())
+                .singleElement()
+                .satisfies(lockerCellView -> {
+                    assertThat(lockerCellView.id()).isEqualTo(lockerCellId);
+                    assertThat(lockerCellView.cellNumber()).isEqualTo("MUT-CELL-001");
+                    assertThat(lockerCellView.size()).isEqualTo(Size.MEDIUM);
+                    assertThat(lockerCellView.occupied()).isFalse();
+                });
+    }
+
+    @Test
+    void findAllCustomersShouldReturnViewsOrderedByNameWithParcelCount() {
+        Long charlieId = applicationService.registerCustomer("Charlie White", "+390000009201");
+        Long aliceId = applicationService.registerCustomer("Alice Brown", "+390000009202");
+
+        applicationService.createParcel(
+                "APP-CUSTOMER-VIEW-001",
+                "First parcel",
+                Size.SMALL,
+                aliceId
+        );
+
+        applicationService.createParcel(
+                "APP-CUSTOMER-VIEW-002",
+                "Second parcel",
+                Size.MEDIUM,
+                aliceId
+        );
+
+        assertThat(applicationService.findAllCustomers())
+                .satisfiesExactly(
+                        aliceView -> {
+                            assertThat(aliceView.id()).isEqualTo(aliceId);
+                            assertThat(aliceView.fullName()).isEqualTo("Alice Brown");
+                            assertThat(aliceView.phoneNumber()).isEqualTo("+390000009202");
+                            assertThat(aliceView.parcelCount()).isEqualTo(2);
+                        },
+                        charlieView -> {
+                            assertThat(charlieView.id()).isEqualTo(charlieId);
+                            assertThat(charlieView.fullName()).isEqualTo("Charlie White");
+                            assertThat(charlieView.phoneNumber()).isEqualTo("+390000009201");
+                            assertThat(charlieView.parcelCount()).isZero();
+                        }
+                );
+    }
 }

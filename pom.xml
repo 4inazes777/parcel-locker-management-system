@@ -292,7 +292,6 @@
                                 <param>com.example.parcellocker.service.*</param>
                                 <param>com.example.parcellocker.application.*</param>
                                 <param>com.example.parcellocker.repository.*</param>
-                                <param>com.example.parcellocker.persistence.TransactionManager</param>
                             </targetClasses>
 
                             <targetTests>
@@ -307,6 +306,7 @@
                                 <param>com.example.parcellocker.ui.*</param>
                                 <param>com.example.parcellocker.application.dto.*</param>
                                 <param>com.example.parcellocker.persistence.JpaUtil</param>
+                                <param>com.example.parcellocker.persistence.TransactionManager</param>
                             </excludedClasses>
 
                             <excludedTestClasses>
