@@ -260,8 +260,19 @@ The report is generated here:
 target/pit-reports/index.html
 ```
 
-The mutation testing report shows that the service and domain layers are strongly tested.
-The remaining surviving mutants are mostly related to application, repository, or persistence infrastructure.
+The mutation testing scope is focused on the domain, service, application, and repository code.
+
+`TransactionManager` is excluded from PIT because it is infrastructure code around JPA transactions. Its behavior is verified through integration tests with JPA/Hibernate, while mutation testing is focused on project-specific business and application logic.
+
+Current local PIT results:
+
+* Line coverage: 100%
+* Generated mutations: 129
+* Killed mutations: 129
+* Mutation coverage: 100%
+* Survived mutations: 0
+* Mutations with no coverage: 0
+* Test strength: 100%
 
 ## Reports
 
@@ -294,12 +305,16 @@ target/pit-reports/index.html
 Current local results:
 
 * Maven verification: successful
-* JaCoCo coverage check: successful
-* PIT mutation coverage: approximately 90%
-* Service layer mutation coverage: 100%
-* Domain layer mutation coverage: high
+* Unit tests: successful
+* Integration tests: successful
 * PostgreSQL integration tests with Testcontainers: successful
 * Swing E2E test: successful
+* JaCoCo coverage check: successful
+* PIT mutation testing: 100% mutation coverage
+* PIT killed mutations: 129 / 129
+* PIT survived mutations: 0
+* PIT mutations with no coverage: 0
+* PIT test strength: 100%
 
 ## Notes
 
