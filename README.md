@@ -1,5 +1,9 @@
 # Parcel Locker Management System
 
+[![Java CI](https://github.com/4inazes777/parcel-locker-management-system/actions/workflows/ci.yml/badge.svg)](https://github.com/4inazes777/parcel-locker-management-system/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=4inazes777_parcel-locker-management-system&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=4inazes777_parcel-locker-management-system)
+[![Coverage Status](https://coveralls.io/repos/github/4inazes777/parcel-locker-management-system/badge.svg?branch=main)](https://coveralls.io/github/4inazes777/parcel-locker-management-system?branch=main)
+
 A Java Swing desktop application for managing parcel lockers and parcel deliveries.
 
 The project was developed for the Automated Software Testing exam.
