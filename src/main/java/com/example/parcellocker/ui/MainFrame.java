@@ -30,6 +30,8 @@ import java.util.Objects;
 
 public class MainFrame extends JFrame {
 
+    private static final long serialVersionUID = 1L;
+
     private final ParcelLockerApplicationService applicationService;
     private final boolean showDialogs;
 

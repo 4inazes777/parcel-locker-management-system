@@ -29,8 +29,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Testcontainers
 class RepositoryPostgresIT {
 
+    @SuppressWarnings("resource")
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
             .withDatabaseName("parcel_locker_test")
             .withUsername("test")
             .withPassword("test");
